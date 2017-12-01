@@ -16,7 +16,7 @@ def webscrap(filepath):
         if line.startswith('#'):
             continue
         if link in line:
-            wiki = line.split()[-2].strip('<').split('?')[0]
+            wiki = line.split()[-2].strip('<>').split('?')[0]
             wikilinks.add(wiki)
     for url in wikilinks:
         crawl(url)
