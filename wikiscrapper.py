@@ -22,8 +22,10 @@ def webscrap(filepath):
             wikilinks.add(wiki)
     for url in wikilinks:
         t1 = threading.Thread(target=crawl, args=(url,))
-        #crawl(url)
+        t2 = threading.Thread(target=info_box, args=(url,))
+		#crawl(url)
         t1.start()
+        t2.start()
    
 def crawl(url):
     try:
@@ -37,14 +39,34 @@ def crawl(url):
         for tag in soup.findAll(tags):
             paragragph =  tag.get_text()
             with open(filename, "a", encoding='utf-8') as f:
-                f.write(paragragph + "\n\n")
+                f.write(paragragph + "\n")
         urlobj.close()
     except Exception:
         print("Exception occured " + str(url))
 
+def info_box(url):
+    try:
+        urlobj = urllib.request.urlopen(url)
+        html = urlobj.read()
+        soup = BeautifulSoup(html, "lxml")
+        table = soup.find('table', class_='infobox vcard')
+        tags = ['th', 'td']
+        dirname = "images"
+        filename = url.split("/")[-1] + "_info.txt"
+        filename = os.path.join(dirname, filename)
+        for tag in table.findAll(tags):
+            paragragph =  tag.get_text()
+            with open(filename, "a", encoding='utf-8') as f:
+                f.write(paragragph + "\n")
+        urlobj.close()
+    except Exception:
+        print("Exception occured " + str(filename))
+		
+		
 if __name__ == "__main__":
     start = time.time()
     webscrap("Sample_Peoples_Data.txt")
+    #info_box("https://en.wikipedia.org/wiki/Chiranjeevi")
     final = time.time()
     total = final - start
     print("total time of execution is " + str(total))
